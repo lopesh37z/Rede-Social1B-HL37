@@ -17,3 +17,14 @@ document.addEventListener("DOMContentLoaded, ()=> {
     if (textNode)  {
         textNode.textContent = 0;
     }
+
+    // coração
+    function applyLikedStyle(){
+        likeSvg.style.fill = "#ef4444";
+        likeSvg.style.stroke = "#ef4444";
+        likeBtn.style.color = "#ef4444";
+
+        // Efeito visual de clique (pop/bounce)
+        likeSvg.style.transform = "scale(1.3)"
+        selfTimeout(()=> (likeSvg.style.transform = "scale(1)"),150 )
+    }
