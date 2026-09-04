@@ -186,3 +186,20 @@ body {
     stroke: currentColor;
     stroke-width: 2;
 }
+
+/* --- Novas Regras CSS para o Estado 'Curtido' --- */
+
+/* Quando o botão de curtida receber a classe 'liked' via JS */
+.action-btn.liked {
+    color: #ef4444; /* Cor vermelha para o texto */
+}
+
+.action-btn.liked svg {
+    fill: #ef4444;    /* Preenche o coração de vermelho */
+    stroke: #ef4444; /* Borda vermelha também */
+}
+
+/* Adiciona uma transição suave para a animação */
+.action-btn svg {
+    transition: transform 0.15s ease-in-out;
+}
