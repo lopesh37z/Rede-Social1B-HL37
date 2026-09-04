@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded, ()=> {
     // Seleciona o botão de curtida e o ícone de coração
     const likeBtn = document.queryselector(".left-actions .action-btn:first-child");
-    if (!likeBtn) return;
+    if (!likeBtn) return; 
 
     const likeSvg = likeBtn.querySelector("svg");
      
@@ -26,5 +26,10 @@ document.addEventListener("DOMContentLoaded, ()=> {
 
         // Efeito visual de clique (pop/bounce)
         likeSvg.style.transform = "scale(1.3)"
-        selfTimeout(()=> (likeSvg.style.transform = "scale(1)"),150 )
+        setTimeout(()=> (likeSvg.style.transform = "scale(1)"),150 )
     }
+
+
+
+
+    
