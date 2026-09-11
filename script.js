@@ -1,73 +1,69 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const likeBtn = document.getElementById("like-button");
-    const likeCountSpan = likeBtn.querySelector(".like-count");
-    const postMedia = document.getElementById("post-media");
-    const heartOverlay = postMedia.querySelector(".heart-overlay");
-    const likesText = document.getElementById("likes-text");
+    // Seleção segura dos elementos pelas suas classes
+    const likeBtn = document.querySelector("#like-button") || document.querySelector(".left-actions .action-btn");
+    const likeCountSpan = likeBtn ? likeBtn.querySelector(".like-count") : null;
+    const postMedia = document.querySelector(".post-media");
+    const likesText = document.querySelector(".likes");
+    const heartOverlay = postMedia ? postMedia.querySelector(".heart-overlay") : null;
 
-    let count = 0;
+    if (!likeBtn || !likeCountSpan) return;
+
     let isLiked = false;
+    let count = 0; // Inicia do zero
 
-    // Atualiza a interface gráfica e os valores
-    function updateLikesUI() {
+    // Função central que atualiza os elementos visuais na tela
+    function updateUI() {
         likeCountSpan.textContent = count;
 
         if (isLiked) {
             likeBtn.classList.add("liked");
-            likesText.innerHTML = count === 1 
-                ? "Curtido por <strong>você</strong>" 
-                : `Curtido por <strong>você</strong> e <strong>outras ${count - 1} pessoas</strong>`;
+            if (likesText) {
+                likesText.innerHTML = "Curtido por <strong>você</strong>";
+            }
         } else {
             likeBtn.classList.remove("liked");
-            likesText.innerHTML = count === 0 
-                ? "Seja o primeiro a curtir" 
-                : `Curtido por <strong>${count} pessoas</strong>`;
+            if (likesText) {
+                likesText.innerHTML = "Seja o primeiro a curtir";
+            }
         }
     }
 
-    // Função para alternar o estado de curtida
+    // Alterna o estado de curtida
     function toggleLike() {
         if (!isLiked) {
             isLiked = true;
-            count++;
+            count = 1;
+            showHeartAnimation();
         } else {
             isLiked = false;
-            count--;
+            count = 0;
         }
-        updateLikesUI();
+        updateUI();
     }
 
-    // Exibe a animação do coração grande sobre a foto
-    function triggerHeartAnimation() {
-        heartOverlay.classList.remove("pop");
-        // Força o reflow para reiniciar a animação CSS
-        void heartOverlay.offsetWidth; 
-        heartOverlay.classList.add("pop");
+    // Dispara a animação do coração grande sobre a foto
+    function showHeartAnimation() {
+        if (!heartOverlay) return;
+        heartOverlay.classList.remove("active");
+        void heartOverlay.offsetWidth; // Força re-render para reiniciar animação
+        heartOverlay.classList.add("active");
     }
 
-    // Evento de clique no botão de curtida
-    likeBtn.addEventListener("click", () => {
+    // Evento de clique no botão de coração
+    likeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
         toggleLike();
     });
 
-    // Evento de duplo clique na foto (Comportamento estilo Instagram)
-    postMedia.addEventListener("dblclick", () => {
-        triggerHeartAnimation();
-        if (!isLiked) {
+    // Evento de clique na imagem principal
+    if (postMedia) {
+        postMedia.addEventListener("click", (e) => {
+            // Evita disparar se clicar no badge do usuário sobre a foto
+            if (e.target.closest(".user-badge")) return;
             toggleLike();
-        }
-    });
+        });
+    }
 
-    // Evento de clique simples na imagem também ativa/desativa a curtida
-    postMedia.addEventListener("click", (e) => {
-        // Evita disparar em duplo clique
-        if (e.detail === 1) {
-            setTimeout(() => {
-                if (e.detail === 1) { // Garante que não foi duplo clique
-                    toggleLike();
-                    if (isLiked) triggerHeartAnimation();
-                }
-            }, 200);
-        }
-    });
+    // Inicializa a tela zerada
+    updateUI();
 });
