@@ -1,46 +1,73 @@
 document.addEventListener("DOMContentLoaded", () => {
     const likeBtn = document.getElementById("like-button");
-    const likeCountElement = likeBtn ? likeBtn.querySelector(".like-count") : null;
-    const mainImg = document.querySelector(".main-img");
+    const likeCountSpan = likeBtn.querySelector(".like-count");
+    const postMedia = document.getElementById("post-media");
+    const heartOverlay = postMedia.querySelector(".heart-overlay");
+    const likesText = document.getElementById("likes-text");
 
-    if (!likeBtn || !likeCountElement) return;
-
-    // Valor base numérico (1.2K = 1200 curtidas)
-    let initialLikes = 1200; 
+    let count = 0;
     let isLiked = false;
 
-    // Converte números grandes para formato abreviado (ex: 1201 -> 1.2K)
-    function formatLikes(count) {
-        if (count >= 1000) {
-            return (count / 1000).toFixed(1) + "K";
-        }
-        return count.toString();
-    }
+    // Atualiza a interface gráfica e os valores
+    function updateLikesUI() {
+        likeCountSpan.textContent = count;
 
-    // Atualiza o estado visual do botão e a contagem
-    function updateLikeState() {
         if (isLiked) {
             likeBtn.classList.add("liked");
-            likeCountElement.textContent = formatLikes(initialLikes + 1);
+            likesText.innerHTML = count === 1 
+                ? "Curtido por <strong>você</strong>" 
+                : `Curtido por <strong>você</strong> e <strong>outras ${count - 1} pessoas</strong>`;
         } else {
             likeBtn.classList.remove("liked");
-            likeCountElement.textContent = formatLikes(initialLikes);
+            likesText.innerHTML = count === 0 
+                ? "Seja o primeiro a curtir" 
+                : `Curtido por <strong>${count} pessoas</strong>`;
         }
     }
 
-    // Alterna a curtida ao clicar no botão
+    // Função para alternar o estado de curtida
+    function toggleLike() {
+        if (!isLiked) {
+            isLiked = true;
+            count++;
+        } else {
+            isLiked = false;
+            count--;
+        }
+        updateLikesUI();
+    }
+
+    // Exibe a animação do coração grande sobre a foto
+    function triggerHeartAnimation() {
+        heartOverlay.classList.remove("pop");
+        // Força o reflow para reiniciar a animação CSS
+        void heartOverlay.offsetWidth; 
+        heartOverlay.classList.add("pop");
+    }
+
+    // Evento de clique no botão de curtida
     likeBtn.addEventListener("click", () => {
-        isLiked = !isLiked;
-        updateLikeState();
+        toggleLike();
     });
 
-    // Curte a publicação ao dar duplo clique na imagem principal
-    if (mainImg) {
-        mainImg.addEventListener("dblclick", () => {
-            if (!isLiked) {
-                isLiked = true;
-                updateLikeState();
-            }
-        });
-    }
+    // Evento de duplo clique na foto (Comportamento estilo Instagram)
+    postMedia.addEventListener("dblclick", () => {
+        triggerHeartAnimation();
+        if (!isLiked) {
+            toggleLike();
+        }
+    });
+
+    // Evento de clique simples na imagem também ativa/desativa a curtida
+    postMedia.addEventListener("click", (e) => {
+        // Evita disparar em duplo clique
+        if (e.detail === 1) {
+            setTimeout(() => {
+                if (e.detail === 1) { // Garante que não foi duplo clique
+                    toggleLike();
+                    if (isLiked) triggerHeartAnimation();
+                }
+            }, 200);
+        }
+    });
 });

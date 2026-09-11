@@ -70,6 +70,8 @@ body {
     width: 100%;
     aspect-ratio: 4 / 5;
     background-color: #eee;
+    cursor: pointer; /* Indica que a tela é clicável */
+    user-select: none;
 }
 
 .post-media img.main-img {
@@ -77,6 +79,30 @@ body {
     height: 100%;
     object-fit: cover;
     display: block;
+}
+
+/* Coração grande sobreposto para o clique na tela */
+.heart-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 80px;
+    height: 80px;
+    fill: #ef4444;
+    pointer-events: none;
+    opacity: 0;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.heart-overlay.pop {
+    animation: popAnimation 0.6s ease-in-out;
+}
+
+@keyframes popAnimation {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.9; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
 }
 
 /* Avatar pequeno com ícone '+' sobreposto na foto */
@@ -147,6 +173,7 @@ body {
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
+    transition: transform 0.15s ease-in-out;
 }
 
 /* Texto de Curtidas */
@@ -187,19 +214,14 @@ body {
     stroke-width: 2;
 }
 
-/* --- Novas Regras CSS para o Estado 'Curtido' --- */
+/* --- Estado 'Curtido' --- */
 
-/* Quando o botão de curtida receber a classe 'liked' via JS */
 .action-btn.liked {
-    color: #ef4444; /* Cor vermelha para o texto */
+    color: #ef4444;
 }
 
 .action-btn.liked svg {
-    fill: #ef4444;    /* Preenche o coração de vermelho */
-    stroke: #ef4444; /* Borda vermelha também */
-}
-
-/* Adiciona uma transição suave para a animação */
-.action-btn svg {
-    transition: transform 0.15s ease-in-out;
+    fill: #ef4444;
+    stroke: #ef4444;
+    transform: scale(1.1);
 }
