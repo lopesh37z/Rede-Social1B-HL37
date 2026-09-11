@@ -1,69 +1,104 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // Seleção segura dos elementos pelas suas classes
-    const likeBtn = document.querySelector("#like-button") || document.querySelector(".left-actions .action-btn");
+    const likeBtn = document.getElementById("like-button");
     const likeCountSpan = likeBtn ? likeBtn.querySelector(".like-count") : null;
     const postMedia = document.querySelector(".post-media");
-    const likesText = document.querySelector(".likes");
-    const heartOverlay = postMedia ? postMedia.querySelector(".heart-overlay") : null;
+    const likesText = document.querySelector(".post-details .likes");
+    const heartOverlay = document.querySelector(".heart-overlay");
 
-    if (!likeBtn || !likeCountSpan) return;
-
+    // Contador iniciando sempre em 0
     let isLiked = false;
-    let count = 0; // Inicia do zero
+    let count = 0;
 
-    // Função central que atualiza os elementos visuais na tela
+    // Função de renderização
     function updateUI() {
-        likeCountSpan.textContent = count;
+        if (likeCountSpan) {
+            likeCountSpan.textContent = count;
+        }
 
-        if (isLiked) {
-            likeBtn.classList.add("liked");
-            if (likesText) {
-                likesText.innerHTML = "Curtido por <strong>você</strong>";
+        if (likeBtn) {
+            if (isLiked) {
+                likeBtn.classList.add("liked");
+            } else {
+                likeBtn.classList.remove("liked");
             }
-        } else {
-            likeBtn.classList.remove("liked");
-            if (likesText) {
-                likesText.innerHTML = "Seja o primeiro a curtir";
+        }
+
+        if (likesText) {
+            if (isLiked) {
+                if (count === 1) {
+                    likesText.innerHTML = 'Curtido por <strong>você</strong>';
+                } else {
+                    likesText.innerHTML = `Curtido por <strong>você</strong> e <strong>outras ${count - 1} pessoas</strong>`;
+                }
+            } else {
+                if (count === 0) {
+                    likesText.innerHTML = 'Seja o primeiro a curtir';
+                } else {
+                    likesText.innerHTML = `Curtido por <strong>${count} pessoas</strong>`;
+                }
             }
         }
     }
 
-    // Alterna o estado de curtida
-    function toggleLike() {
-        if (!isLiked) {
-            isLiked = true;
-            count = 1;
-            showHeartAnimation();
+    // Animação do coração na imagem
+    function triggerHeartAnimation() {
+        if (!heartOverlay) return;
+        heartOverlay.classList.remove("animate");
+        void heartOverlay.offsetWidth; // Força re-flow para reiniciar animação
+        heartOverlay.classList.add("animate");
+    }
+
+    // Alternar estado do Like
+    function toggleLike(forceLike = false) {
+        if (forceLike) {
+            if (!isLiked) {
+                isLiked = true;
+                count += 1;
+                triggerHeartAnimation();
+            } else {
+                triggerHeartAnimation();
+            }
         } else {
-            isLiked = false;
-            count = 0;
+            if (isLiked) {
+                isLiked = false;
+                count -= 1;
+            } else {
+                isLiked = true;
+                count += 1;
+                triggerHeartAnimation();
+            }
         }
         updateUI();
     }
 
-    // Dispara a animação do coração grande sobre a foto
-    function showHeartAnimation() {
-        if (!heartOverlay) return;
-        heartOverlay.classList.remove("active");
-        void heartOverlay.offsetWidth; // Força re-render para reiniciar animação
-        heartOverlay.classList.add("active");
-    }
-
-    // Evento de clique no botão de coração
-    likeBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        toggleLike();
-    });
-
-    // Evento de clique na imagem principal
-    if (postMedia) {
-        postMedia.addEventListener("click", (e) => {
-            // Evita disparar se clicar no badge do usuário sobre a foto
-            if (e.target.closest(".user-badge")) return;
-            toggleLike();
+    // Clique no botão
+    if (likeBtn) {
+        likeBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            toggleLike(false);
         });
     }
 
-    // Inicializa a tela zerada
+    // Clique na foto
+    if (postMedia) {
+        let clickTimer = null;
+
+        postMedia.addEventListener("click", (e) => {
+            if (e.target.closest(".user-badge")) return;
+
+            if (clickTimer === null) {
+                clickTimer = setTimeout(() => {
+                    clickTimer = null;
+                    toggleLike(false);
+                }, 250);
+            } else {
+                clearTimeout(clickTimer);
+                clickTimer = null;
+                toggleLike(true);
+            }
+        });
+    }
+
+    // Executa no carregamento para garantir a tela zerada
     updateUI();
 });
