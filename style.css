@@ -70,9 +70,8 @@ body {
     width: 100%;
     aspect-ratio: 4 / 5;
     background-color: #eee;
-    cursor: pointer;
+    cursor: pointer; /* Indica que a tela é clicável */
     user-select: none;
-    overflow: hidden;
 }
 
 .post-media img.main-img {
@@ -82,46 +81,28 @@ body {
     display: block;
 }
 
-/* Coração animado sobreposto na foto */
+/* Coração grande sobreposto para o clique na tela */
 .heart-overlay {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
-    width: 90px;
-    height: 90px;
+    width: 80px;
+    height: 80px;
     fill: #ef4444;
     pointer-events: none;
     opacity: 0;
-    z-index: 10;
-    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+    transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.heart-overlay.animate {
-    animation: heartPop 0.75s ease-in-out forwards;
+.heart-overlay.pop {
+    animation: popAnimation 0.6s ease-in-out;
 }
 
-@keyframes heartPop {
-    0% {
-        transform: translate(-50%, -50%) scale(0);
-        opacity: 0;
-    }
-    20% {
-        transform: translate(-50%, -50%) scale(1.25);
-        opacity: 0.95;
-    }
-    40% {
-        transform: translate(-50%, -50%) scale(0.95);
-        opacity: 1;
-    }
-    60% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(1.3);
-        opacity: 0;
-    }
+@keyframes popAnimation {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.9; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
 }
 
 /* Avatar pequeno com ícone '+' sobreposto na foto */
@@ -182,7 +163,6 @@ body {
     cursor: pointer;
     background: none;
     border: none;
-    outline: none;
 }
 
 .action-btn svg {
@@ -193,10 +173,10 @@ body {
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 0.15s ease-in-out;
 }
 
-/* Detalhes do texto de curtidas */
+/* Texto de Curtidas */
 .post-details {
     padding: 0 16px 12px 16px;
     font-size: 13px;
@@ -208,7 +188,7 @@ body {
 }
 
 .likes strong {
-    color: #ffffff;
+    color: #e9eef6;
 }
 
 /* Barra de Navegação Inferior */
@@ -234,7 +214,8 @@ body {
     stroke-width: 2;
 }
 
-/* --- Estado Curtido --- */
+/* --- Estado 'Curtido' --- */
+
 .action-btn.liked {
     color: #ef4444;
 }
@@ -242,5 +223,5 @@ body {
 .action-btn.liked svg {
     fill: #ef4444;
     stroke: #ef4444;
-    transform: scale(1.15);
+    transform: scale(1.1);
 }
