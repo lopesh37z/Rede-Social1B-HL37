@@ -5,100 +5,51 @@ document.addEventListener("DOMContentLoaded", () => {
     const likesText = document.querySelector(".post-details .likes");
     const heartOverlay = document.querySelector(".heart-overlay");
 
-    // Contador iniciando sempre em 0
-    let isLiked = false;
     let count = 0;
 
-    // Função de renderização
-    function updateUI() {
+    // Dispara a animação do coração sobreposto na foto
+    function triggerHeartAnimation() {
+        if (!heartOverlay) return;
+        heartOverlay.classList.remove("pop");
+        void heartOverlay.offsetWidth; // Força reflow no navegador para reiniciar a animação
+        heartOverlay.classList.add("pop");
+    }
+
+    // Incrementa o contador de curtidas
+    function addLike() {
+        count++;
+
+        // Atualiza a contagem no botão
         if (likeCountSpan) {
             likeCountSpan.textContent = count;
         }
 
+        // Mantém o ícone vermelho
         if (likeBtn) {
-            if (isLiked) {
-                likeBtn.classList.add("liked");
-            } else {
-                likeBtn.classList.remove("liked");
-            }
+            likeBtn.classList.add("liked");
         }
 
+        // Atualiza a legenda das curtidas
         if (likesText) {
-            if (isLiked) {
-                if (count === 1) {
-                    likesText.innerHTML = 'Curtido por <strong>você</strong>';
-                } else {
-                    likesText.innerHTML = `Curtido por <strong>você</strong> e <strong>outras ${count - 1} pessoas</strong>`;
-                }
-            } else {
-                if (count === 0) {
-                    likesText.innerHTML = 'Seja o primeiro a curtir';
-                } else {
-                    likesText.innerHTML = `Curtido por <strong>${count} pessoas</strong>`;
-                }
-            }
+            likesText.innerHTML = `Curtido por <strong>${count.toLocaleString()} pessoas</strong>`;
         }
+
+        triggerHeartAnimation();
     }
 
-    // Animação do coração na imagem
-    function triggerHeartAnimation() {
-        if (!heartOverlay) return;
-        heartOverlay.classList.remove("animate");
-        void heartOverlay.offsetWidth; // Força re-flow para reiniciar animação
-        heartOverlay.classList.add("animate");
-    }
-
-    // Alternar estado do Like
-    function toggleLike(forceLike = false) {
-        if (forceLike) {
-            if (!isLiked) {
-                isLiked = true;
-                count += 1;
-                triggerHeartAnimation();
-            } else {
-                triggerHeartAnimation();
-            }
-        } else {
-            if (isLiked) {
-                isLiked = false;
-                count -= 1;
-            } else {
-                isLiked = true;
-                count += 1;
-                triggerHeartAnimation();
-            }
-        }
-        updateUI();
-    }
-
-    // Clique no botão
+    // Incrementa ao clicar no botão de coração
     if (likeBtn) {
         likeBtn.addEventListener("click", (e) => {
             e.stopPropagation();
-            toggleLike(false);
+            addLike();
         });
     }
 
-    // Clique na foto
+    // Incrementa ao clicar na mídia/imagem
     if (postMedia) {
-        let clickTimer = null;
-
         postMedia.addEventListener("click", (e) => {
             if (e.target.closest(".user-badge")) return;
-
-            if (clickTimer === null) {
-                clickTimer = setTimeout(() => {
-                    clickTimer = null;
-                    toggleLike(false);
-                }, 250);
-            } else {
-                clearTimeout(clickTimer);
-                clickTimer = null;
-                toggleLike(true);
-            }
+            addLike();
         });
     }
-
-    // Executa no carregamento para garantir a tela zerada
-    updateUI();
 });
